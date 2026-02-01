@@ -1,0 +1,73 @@
+
+MINI PROJECT 1 – COMP370: SOFTWARE ENGINEERING
+Server Redundancy Management System (SRMS)
+
+--------------------------------------------------
+STEP 1: REQUIREMENTS GATHERING AND SPECIFICATION
+--------------------------------------------------
+
+Stakeholders:
+- System Administrators
+- End Users (Clients)
+- Developers and Maintainers
+- Instructors and Evaluators
+
+Problem Statement:
+The system simulates a cluster of servers where one primary server handles client requests and backup servers take over automatically when failures occur.
+
+Functional Requirements:
+- Clients can send requests to the primary server
+- Only one primary server exists at any time
+- Backup servers automatically take over on failure
+- Server health is monitored using heartbeats
+
+Non-Functional Requirements:
+- Failures are detected within a few missed heartbeats
+- Service resumes quickly after failover
+- System avoids split-brain situations
+- Events are logged clearly
+
+--------------------------------------------------
+STEP 2: SYSTEM DESIGN USING UML
+--------------------------------------------------
+
+The system uses a primary-backup architecture.
+Key components:
+- ServerProcess (abstract)
+- PrimaryServer
+- BackupServer
+- Monitor
+- Client
+
+Sequence diagrams illustrate:
+- Startup and leader election
+- Normal client request handling
+- Client request during failover
+
+--------------------------------------------------
+STEP 3: SYSTEM AND OOP DESIGN
+--------------------------------------------------
+
+The system follows core OOP principles:
+- Encapsulation
+- Single Responsibility
+- Controlled use of inheritance
+
+Main classes:
+- IMessageSerializer: message abstraction
+- ServerProcess: shared server behavior
+- PrimaryServer: handles client requests
+- BackupServer: standby server
+- FailoverManager: selects new primary deterministically
+
+--------------------------------------------------
+STEP 4: NETWORKING AND CONCURRENCY
+--------------------------------------------------
+
+Each server:
+- Runs as an independent JVM
+- Uses ServerSocket to accept connections
+- Uses a thread pool for concurrency
+- Runs a heartbeat thread to report health
+
+
