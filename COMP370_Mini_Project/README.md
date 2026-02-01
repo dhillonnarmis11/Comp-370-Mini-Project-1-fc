@@ -3,8 +3,11 @@
 # Team Members - Group 4
 
 Simran Dhillon 300211810
+
 Charvi Charvi 300207650
+
 Harjot Josan 300211962
+
 Mohammad Salema 300223224
 
 ---
