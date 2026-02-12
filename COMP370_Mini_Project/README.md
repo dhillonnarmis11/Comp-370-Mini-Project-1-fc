@@ -72,6 +72,12 @@ COMP370_Mini_Project/
 ## How to Compile
 
 ```
+Prerequisites
+
+Java Development Kit (JDK) 8 or higher
+Operating System: Linux, macOS, or Windows
+Network: Localhost support (for testing)
+
 Step 1: Navigate to Source Directory
 cd COMP370_Mini_Project/src
 
