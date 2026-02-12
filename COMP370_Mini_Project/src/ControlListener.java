@@ -3,19 +3,27 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+// ControlListener listens on separate control port to receive admin commands
+
 public class ControlListener implements Runnable {
     private final ServerProcess server;
-    private final int controlPort;
+    private final int controlPort; // port used for control commands
+
+    // Constructor initializes server reference and control port
 
     public ControlListener(ServerProcess server, int controlPort) {
-        this.server = server;
+        this.server = server; 
         this.controlPort = controlPort;
     }
+
+    // runs in its own thread, waits for control connections and processes commands
 
     @Override
     public void run() {
         try (ServerSocket ss = new ServerSocket(controlPort)) {
             Log.info("SERVER-" + server.serverId, "Control listener on port " + controlPort);
+
+            // keep listening while the server is running
 
             while (server.running) {
                 Socket s = ss.accept();
@@ -28,7 +36,7 @@ public class ControlListener implements Runnable {
                         Log.info("SERVER-" + server.serverId, "PROMOTED to PRIMARY");
                     }
                 } finally {
-                    s.close();
+                    s.close(); // Close control connection
                 }
             }
         } catch (Exception e) {
