@@ -8,16 +8,19 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+// monitor keeps track of server heartbeats and handles automatic failover
 public class Monitor {
 
     private final int hbPort;
     private final long timeoutMs;
 
+    // stores last heartbeat time for each server
     private final Map<String, Long> lastHb = new ConcurrentHashMap<>();
+    // stores host and control port info for each server
     private final Map<String, String> hosts = new ConcurrentHashMap<>();
     private final Map<String, Integer> controlPorts = new ConcurrentHashMap<>();
 
-    private volatile String primaryId = null;
+    private volatile String primaryId = null; // current primary server
     private final FailoverManager failoverManager = new FailoverManager();
 
     public Monitor(int hbPort, long timeoutMs) {
@@ -25,12 +28,14 @@ public class Monitor {
         this.timeoutMs = timeoutMs;
     }
 
+    // registers a server so monitor knows how to contact it
     public void registerServer(String serverId, String host, int controlPort) {
         hosts.put(serverId, host);
         controlPorts.put(serverId, controlPort);
         Log.info("MONITOR", "Registered server " + serverId + " host=" + host + " ctrlPort=" + controlPort);
     }
 
+    // starts heartbeat listener, failure checker, and admin console
     public void start() throws Exception {
         Log.info("MONITOR", "Starting monitor hbPort=" + hbPort + " timeoutMs=" + timeoutMs);
 
@@ -40,9 +45,10 @@ public class Monitor {
         Thread checker = new Thread(this::checkLoop, "fail-checker");
         checker.start();
 
-        adminLoop();
+        adminLoop(); // runs in main thread
     }
 
+    // listens for UDP heartbeat messages from servers
     private void listenHeartbeats() {
         try (DatagramSocket sock = new DatagramSocket(hbPort)) {
             byte[] buf = new byte[256];
@@ -56,9 +62,12 @@ public class Monitor {
                     String[] parts = msg.split("\\|");
                     if (parts.length >= 2) {
                         String id = parts[1];
+
+                        // update last heartbeat time
                         lastHb.put(id, System.currentTimeMillis());
                         Log.info("MONITOR", "Heartbeat received from " + id);
 
+                        // first server to send heartbeat becomes initial primary
                         if (primaryId == null) {
                             primaryId = id;
                             Log.info("MONITOR", "Initial primary set to " + primaryId);
@@ -71,6 +80,7 @@ public class Monitor {
         }
     }
 
+    // checks if primary has timed out
     private void checkLoop() {
         while (true) {
             try {
@@ -88,6 +98,7 @@ public class Monitor {
         }
     }
 
+    // returns set of servers that have not timed out
     private Set<String> getAliveSet() {
         long now = System.currentTimeMillis();
         Set<String> alive = new HashSet<>();
@@ -99,6 +110,7 @@ public class Monitor {
         return alive;
     }
 
+    // chooses and promotes a new primary server
     private synchronized void promoteNewPrimary(Set<String> alive) {
         if (alive.isEmpty()) {
             Log.info("MONITOR", "No alive servers. Cannot promote.");
@@ -109,12 +121,13 @@ public class Monitor {
         String newPrimary = failoverManager.selectNewPrimary(alive);
         Log.info("MONITOR", "Selected new primary: " + newPrimary);
 
-        sendPromote(newPrimary);
+        sendPromote(newPrimary); // tell server to become primary
 
         primaryId = newPrimary;
         Log.info("MONITOR", "Primary updated to " + primaryId);
     }
 
+    // sends PROMOTE command to selected server
     private void sendPromote(String serverId) {
         try {
             String host = hosts.get(serverId);
@@ -137,6 +150,7 @@ public class Monitor {
         }
     }
 
+    // simple admin console to check status or trigger manual failover
     private void adminLoop() {
         Scanner sc = new Scanner(System.in);
         while (true) {
@@ -159,6 +173,7 @@ public class Monitor {
         }
     }
 
+    // prints current primary and heartbeat ages
     private void printStatus() {
         long now = System.currentTimeMillis();
         System.out.println("Primary=" + primaryId);
@@ -168,6 +183,7 @@ public class Monitor {
         }
     }
 
+    // main method to start monitor and register servers
     public static void main(String[] args) throws Exception {
         Log.setLogFile("logs/monitor.log");
 
