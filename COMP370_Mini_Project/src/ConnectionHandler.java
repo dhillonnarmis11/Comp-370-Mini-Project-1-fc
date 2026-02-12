@@ -4,15 +4,23 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+// ConnectionHandler handles communication with single client
+// runs in its own thread so multiple clients can connect at once
+
 public class ConnectionHandler implements Runnable {
 
     private final Socket socket;
     private final ServerProcess server;
 
+    // constructor sets up socket and server reference
+
     public ConnectionHandler(Socket socket, ServerProcess server) {
         this.socket = socket;
         this.server = server;
     }
+
+    // runs when thread starts
+    // reads client request, logs it, passes it to the server to handle
 
     @Override
     public void run() {
