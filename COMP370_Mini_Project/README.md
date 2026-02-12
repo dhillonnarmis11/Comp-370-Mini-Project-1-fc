@@ -31,9 +31,7 @@ The system consists of multiple independent server processes, a monitor componen
 Servers periodically send heartbeat messages so the monitor can track their health. If the primary
 server becomes unavailable, the monitor promotes a backup server to primary using a deterministic
 rule. Clients always communicate with the current primary server and can automatically reconnect
-after a failover.
-
-Networking is implemented using Java sockets, and concurrency is handled using thread pools so
+after a failover. Networking is implemented using Java sockets, and concurrency is handled using thread pools so
 multiple requests and heartbeat messages can be processed at the same time. Logging is used to
 track important events such as server startup, failures, and failovers.
 
@@ -42,16 +40,62 @@ track important events such as server startup, failures, and failovers.
 ## Folder Structure
 
 ```
-src/ Java source files
-docs/ UML diagrams and documentation
-scripts/ Scripts for running the system and simulating failures
-tests/ Test scenarios and results
+COMP370_Mini_Project/
+│
+├── src/                          # Java source files
+│   ├── ServerMain.java           # Entry point for server processes
+│   ├── Monitor.java              # Monitor with heartbeat tracking
+│   ├── ServerProcess.java        # Abstract server base class
+│   ├── PrimaryServer.java        # Primary server implementation
+│   ├── BackupServer.java         # Backup server implementation
+│   ├── ConnectionHandler.java    # Client connection handler
+│   ├── ControlListener.java      # Listens for PROMOTE commands
+│   ├── HeartbeatSenderUDP.java   # Sends heartbeat messages
+│   ├── FailoverManager.java      # Failover selection logic
+│   ├── Log.java                  # Logging utility
+│   └── logs/                     # Log files directory
+│       ├── monitor.log
+│       ├── server-1.log
+│       ├── server-2.log
+│       └── server-3.log
+│
+├── docs/                         # Documentation and UML diagrams
+│   ├── Step_3_Design.pdf
+│   ├── Step_7_and_8.pdf
+│   ├── report_steps_1_to_4.txt
+│   └── steps_1_2_planning.pdf
+│
+└── README.md                     # This file
 ```
 
 
 ## How to Compile
-From inside the `src` folder:
+
 ```
+Step 1: Navigate to Source Directory
+cd COMP370_Mini_Project/src
+
+Step 2: Compile All Java Files
 javac *.java
+
+Verify Compilation
+Check that .class files were created:
+ls *.class
+
+Running the System
+The system requires running multiple processes in separate terminal windows.
+Terminal 1: Start the Monitor (The monitor tracks server health and manages failover)
+cd COMP370_Mini_Project/src
+java Monitor
+Terminal 2: Start Server 1 (Primary)
+cd COMP370_Mini_Project/src
+java ServerMain 1 8001 9101 primary
+Terminal 3: Start Server 2 (Backup)
+cd COMP370_Mini_Project/src
+java ServerMain 2 8002 9102 backup
+Terminal 4: Start Server 3 (Backup)
+cd COMP370_Mini_Project/src
+java ServerMain 3 8003 9103 backup
+
 ```
 
