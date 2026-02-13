@@ -78,30 +78,25 @@ Java Development Kit (JDK) 8 or higher
 Operating System: Linux, macOS, or Windows
 Network: Localhost support (for testing)
 
-Step 1: Navigate to Source Directory
-cd COMP370_Mini_Project/src
-
-Step 2: Compile All Java Files
-javac *.java
-
-Verify Compilation
-Check that .class files were created:
-ls *.class
-
 Running the System
 The system requires running multiple processes in separate terminal windows.
-Terminal 1: Start the Monitor (The monitor tracks server health and manages failover)
-cd COMP370_Mini_Project/src
-java Monitor
-Terminal 2: Start Server 1 (Primary)
-cd COMP370_Mini_Project/src
-java ServerMain 1 8001 9101 primary
-Terminal 3: Start Server 2 (Backup)
-cd COMP370_Mini_Project/src
-java ServerMain 2 8002 9102 backup
-Terminal 4: Start Server 3 (Backup)
-cd COMP370_Mini_Project/src
-java ServerMain 3 8003 9103 backup
+Navigate to Source Directory for each server and start
+
+Terminal 1- Monitor
+cd ~/Desktop/projectComp370
+java -cp bin Monitor
+
+Server 1- Primary
+cd ~/Desktop/projectComp370
+java -cp bin ServerMain 1 9001 9101 primary
+
+Server 2- backup 
+cd ~/Desktop/projectComp370
+java -cp bin ServerMain 2 9002 9102 backup
+
+Server 3
+cd ~/Desktop/projectComp370
+java -cp bin ServerMain 3 9003 9103 backup
 
 ```
 
