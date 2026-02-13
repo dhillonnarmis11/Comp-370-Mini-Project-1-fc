@@ -60,6 +60,7 @@ COMP370_Mini_Project/
 │       └── server-3.log
 │
 ├── docs/                         # Documentation and UML diagrams
+│   ├── Mini_Project_1_Final_Report.pdf
 │   ├── Step_3_Design.pdf
 │   ├── Step_7_and_8.pdf
 │   ├── report_steps_1_to_4.txt
